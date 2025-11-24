@@ -1,6 +1,8 @@
 # Glassy
 ### Transform any image into a stylized corrugated glass poster with irregular vertical ribs, glue-like distortion, and a centered acrylic window — all powered by pure HTML Canvas (no WebGL, no libraries, fully client-side).
 
+link: https://triloux.github.io/glassy/
+
 This effect is inspired by modern graphic posters that use rippled acrylic sheets to bend and smear the subject in a fluid, glass-like way.
 
 ---
