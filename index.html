@@ -1,0 +1,870 @@
+<!-- <!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Glass Stripes Poster</title>
+  <style>
+    :root {
+      --bg: #020617;
+      --card: #020617;
+      --border: rgba(148, 163, 255, .25);
+      --text: #e5edff;
+      --muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(900px 600px at 15% 0%, #111827 0%, #020617 55%, #000 100%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        Segoe UI, Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .wrap {
+      max-width: 1200px;
+      width: 100%;
+      margin: 32px auto;
+      padding: 0 24px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      margin: 0 0 10px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin: 0 0 22px;
+      max-width: 560px;
+      line-height: 1.5;
+    }
+
+    .card {
+      background: radial-gradient(circle at 0% 0%, rgba(59, 130, 246, .16), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(56, 189, 248, .18), transparent 60%),
+        var(--card);
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      padding: 18px 18px 22px;
+      box-shadow: 0 32px 90px rgba(15, 23, 42, .9);
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, .9fr);
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .card {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .poster-shell {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 255, .35);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 1),
+        0 40px 120px rgba(0, 0, 0, .95);
+      aspect-ratio: 1 / 1;
+      background: #000;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #000;
+    }
+
+    /* soft glass reflection */
+    .poster-shell::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(130deg,
+          rgba(255, 255, 255, .18) 0%,
+          rgba(255, 255, 255, .0) 24%,
+          rgba(255, 255, 255, .04) 55%,
+          rgba(255, 255, 255, 0) 100%);
+      mix-blend-mode: screen;
+      opacity: .45;
+      pointer-events: none;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding: 6px 4px;
+    }
+
+    label.button {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid rgba(148, 163, 255, .55);
+      cursor: pointer;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    input[type=file] {
+      display: none;
+    }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid rgba(148, 163, 255, .55);
+      cursor: pointer;
+      color: var(--text);
+      font-size: 14px;
+      height: 40px;
+    }
+
+    button:disabled {
+      opacity: .45;
+      cursor: default;
+    }
+
+    .btn-row {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .sliders {
+      display: grid;
+      grid-template-columns: 170px 1fr 48px;
+      gap: 10px 14px;
+      align-items: center;
+      margin-top: 6px;
+    }
+
+    .sliders label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    input[type=range] {
+      width: 100%;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 6px;
+      max-width: 360px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <h1>Glass Stripes</h1>
+    <p class="subtitle">
+      Upload an image and turn it into a corrugated-glass poster. A centered square window is distorted
+      with vertical glass ribs, similar to rippled acrylic panels.
+    </p>
+
+    <div class="card">
+      <div class="poster-shell">
+        <canvas id="poster" width="900" height="900"></canvas>
+      </div>
+
+      <div class="controls">
+        <div>
+          <label class="button">
+            📤 Choose image
+            <input id="file" type="file" accept="image/*">
+          </label>
+          <div class="btn-row">
+            <button id="apply" disabled>Apply glass effect</button>
+            <button id="download" disabled>Download PNG</button>
+          </div>
+          <p class="hint">
+            Glass density controls rib spacing. Distortion strength changes how wavy each rib feels.
+          </p>
+        </div>
+
+        <div class="sliders">
+          <label>Glass density</label>
+          <input id="density" type="range" min="5" max="60" value="25">
+          <span id="densityVal" class="mono">25</span>
+
+          <label>Distortion strength</label>
+          <input id="strength" type="range" min="0" max="100" value="60">
+          <span id="strengthVal" class="mono">60</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('file');
+    const applyBtn = document.getElementById('apply');
+    const dlBtn = document.getElementById('download');
+
+    const density = document.getElementById('density');
+    const densityVal = document.getElementById('densityVal');
+
+    const strength = document.getElementById('strength');
+    const strengthVal = document.getElementById('strengthVal');
+
+    const canvas = document.getElementById('poster');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+    const srcCanvas = document.createElement('canvas');
+    const sctx = srcCanvas.getContext('2d', { willReadFrequently: true });
+
+    let imgBitmap = null;
+
+    density.addEventListener('input', () => {
+      densityVal.textContent = density.value;
+      if (imgBitmap) applyEffect();
+    });
+
+    strength.addEventListener('input', () => {
+      strengthVal.textContent = strength.value;
+      if (imgBitmap) applyEffect();
+    });
+
+    fileInput.addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      imgBitmap = await createImageBitmap(file, { colorSpaceConversion: 'none' });
+      fitAndDrawBase();
+      applyBtn.disabled = false;
+      dlBtn.disabled = true;
+    });
+
+    applyBtn.addEventListener('click', () => {
+      if (!imgBitmap) return;
+      applyEffect();
+      dlBtn.disabled = false;
+    });
+
+    dlBtn.addEventListener('click', () => {
+      const a = document.createElement('a');
+      a.download = 'glass_stripes_poster.png';
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+    });
+
+    function fitAndDrawBase() {
+      const w = canvas.width;
+      const h = canvas.height;
+
+      const s = Math.min(w / imgBitmap.width, h / imgBitmap.height);
+      const dw = imgBitmap.width * s;
+      const dh = imgBitmap.height * s;
+      const dx = (w - dw) / 2;
+      const dy = (h - dh) / 2;
+
+      srcCanvas.width = w;
+      srcCanvas.height = h;
+
+      sctx.fillStyle = "#000";
+      sctx.fillRect(0, 0, w, h);
+      sctx.drawImage(imgBitmap, dx, dy, dw, dh);
+
+      ctx.drawImage(srcCanvas, 0, 0);
+    }
+
+    function applyEffect() {
+      const w = canvas.width;
+      const h = canvas.height;
+
+      const baseData = sctx.getImageData(0, 0, w, h);
+      const base = baseData.data;
+
+      const distData = ctx.createImageData(w, h);
+      const dist = distData.data;
+
+      // start with original image everywhere
+      dist.set(base);
+
+      // central square region (70% of min dim)
+      const sqSize = Math.round(Math.min(w, h) * 0.7);
+      const sqX0 = Math.round((w - sqSize) / 2);
+      const sqY0 = Math.round((h - sqSize) / 2);
+      const sqX1 = sqX0 + sqSize;
+      const sqY1 = sqY0 + sqSize;
+
+      const period = parseInt(density.value, 10);       // rib width
+      const strengthNum = parseInt(strength.value, 10) / 100;
+
+      const amp = period * 1.2 * strengthNum;          // vertical distortion amplitude
+      const rippleFreq = 2;                            // bumps per rib
+
+      for (let x = sqX0; x < sqX1; x++) {
+        const localX = x - sqX0;
+        const mod = localX % period;
+        const u = mod / period; // 0..1 inside rib
+
+        // vertical distortion per rib
+        const wave = Math.sin(u * rippleFreq * Math.PI * 2);
+        const offsetCol = wave * amp;
+
+        // rib shading: subtle (option C: 0.8..1)
+        const rib = Math.cos(u * Math.PI * 2);
+        const shade = 0.8 + 0.2 * ((rib + 1) / 2); // very soft ribs
+
+        for (let y = sqY0; y < sqY1; y++) {
+          const localY = y - sqY0;
+
+          let srcLocalY = Math.round(localY + offsetCol);
+          srcLocalY = ((srcLocalY % sqSize) + sqSize) % sqSize; // wrap 0..sqSize-1
+          const srcY = sqY0 + srcLocalY;
+
+          const di = (y * w + x) * 4;
+          const si = (srcY * w + x) * 4;
+
+          let r = base[si];
+          let g = base[si + 1];
+          let b = base[si + 2];
+          const a = base[si + 3];
+
+          r *= shade;
+          g *= shade;
+          b *= shade;
+
+          dist[di] = r;
+          dist[di + 1] = g;
+          dist[di + 2] = b;
+          dist[di + 3] = a;
+        }
+      }
+
+      ctx.putImageData(distData, 0, 0);
+
+      // ---- draw DRP-style glass frame around distorted square ----
+      ctx.save();
+      const radius = 12;
+
+      ctx.imageSmoothingEnabled = false;
+
+      // 1) Outer soft shadow
+      ctx.shadowColor = "rgba(0,0,0,0.55)";
+      ctx.shadowBlur = 22;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 4;
+
+      ctx.strokeStyle = "rgba(0,0,0,0)";
+      ctx.lineWidth = 1;
+
+      ctx.beginPath();
+      roundedRect(ctx, sqX0 + 0.5, sqY0 + 0.5, sqSize - 1, sqSize - 1, radius);
+      ctx.stroke();
+
+      // clear shadow
+      ctx.shadowColor = "transparent";
+
+      // 2) Thin white border
+      ctx.strokeStyle = "rgba(255,255,255,0.75)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      roundedRect(ctx, sqX0 + 0.5, sqY0 + 0.5, sqSize - 1, sqSize - 1, radius);
+      ctx.stroke();
+
+      // 3) Inner glow
+      ctx.strokeStyle = "rgba(255,255,255,0.2)";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      roundedRect(ctx, sqX0 + 2.5, sqY0 + 2.5, sqSize - 5, sqSize - 5, radius - 4);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // helper: rounded rectangle path
+    function roundedRect(ctx, x, y, w, h, r) {
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+    }
+  </script>
+</body>
+
+</html> -->
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Glass Stripes Poster</title>
+  <style>
+    :root {
+      --bg: #020617;
+      --card: #020617;
+      --border: rgba(148, 163, 255, .25);
+      --text: #e5edff;
+      --muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(900px 600px at 15% 0%, #111827 0%, #020617 55%, #000 100%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        Segoe UI, Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .wrap {
+      max-width: 1200px;
+      width: 100%;
+      margin: 32px auto;
+      padding: 0 24px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      margin: 0 0 10px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin: 0 0 22px;
+      max-width: 560px;
+      line-height: 1.5;
+    }
+
+    .card {
+      background: radial-gradient(circle at 0% 0%, rgba(59, 130, 246, .16), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(56, 189, 248, .18), transparent 60%),
+        var(--card);
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      padding: 18px 18px 22px;
+      box-shadow: 0 32px 90px rgba(15, 23, 42, .9);
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, .9fr);
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .card {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .poster-shell {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 255, .35);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 1),
+        0 40px 120px rgba(0, 0, 0, .95);
+      aspect-ratio: 1 / 1;
+      background: #000;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #000;
+    }
+
+    /* soft glass reflection */
+    .poster-shell::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(130deg,
+          rgba(255, 255, 255, .18) 0%,
+          rgba(255, 255, 255, .0) 24%,
+          rgba(255, 255, 255, .04) 55%,
+          rgba(255, 255, 255, 0) 100%);
+      mix-blend-mode: screen;
+      opacity: .45;
+      pointer-events: none;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding: 6px 4px;
+    }
+
+    label.button {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid rgba(148, 163, 255, .55);
+      cursor: pointer;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    input[type=file] {
+      display: none;
+    }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: #020617;
+      border: 1px solid rgba(148, 163, 255, .55);
+      cursor: pointer;
+      color: var(--text);
+      font-size: 14px;
+      height: 40px;
+    }
+
+    button:disabled {
+      opacity: .45;
+      cursor: default;
+    }
+
+    .btn-row {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .sliders {
+      display: grid;
+      grid-template-columns: 170px 1fr 48px;
+      gap: 10px 14px;
+      align-items: center;
+      margin-top: 6px;
+    }
+
+    .sliders label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    input[type=range] {
+      width: 100%;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 6px;
+      max-width: 360px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <h1>Glass Stripes</h1>
+    <p class="subtitle">
+      Upload an image and turn it into a corrugated-glass poster. A centered square window is distorted
+      with vertical glass ribs, similar to rippled acrylic panels.
+    </p>
+
+    <div class="card">
+      <div class="poster-shell">
+        <canvas id="poster" width="900" height="900"></canvas>
+      </div>
+
+      <div class="controls">
+        <div>
+          <label class="button">
+            📤 Choose image
+            <input id="file" type="file" accept="image/*">
+          </label>
+          <div class="btn-row">
+            <button id="apply" disabled>Apply glass effect</button>
+            <button id="download" disabled>Download PNG</button>
+          </div>
+          <p class="hint">
+            Glass density controls rib spacing. Distortion strength changes how wavy each rib feels.
+          </p>
+        </div>
+
+        <div class="sliders">
+          <label>Glass density</label>
+          <input id="density" type="range" min="5" max="60" value="25">
+          <span id="densityVal" class="mono">25</span>
+
+          <label>Distortion strength</label>
+          <input id="strength" type="range" min="0" max="100" value="60">
+          <span id="strengthVal" class="mono">60</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('file');
+    const applyBtn = document.getElementById('apply');
+    const dlBtn = document.getElementById('download');
+
+    const density = document.getElementById('density');
+    const densityVal = document.getElementById('densityVal');
+
+    const strength = document.getElementById('strength');
+    const strengthVal = document.getElementById('strengthVal');
+
+    const canvas = document.getElementById('poster');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+    const srcCanvas = document.createElement('canvas');
+    const sctx = srcCanvas.getContext('2d', { willReadFrequently: true });
+
+    let imgBitmap = null;
+
+    density.addEventListener('input', () => {
+      densityVal.textContent = density.value;
+      if (imgBitmap) applyEffect();
+    });
+
+    strength.addEventListener('input', () => {
+      strengthVal.textContent = strength.value;
+      if (imgBitmap) applyEffect();
+    });
+
+    fileInput.addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      imgBitmap = await createImageBitmap(file, { colorSpaceConversion: 'none' });
+      fitAndDrawBase();
+      applyBtn.disabled = false;
+      dlBtn.disabled = true;
+    });
+
+    applyBtn.addEventListener('click', () => {
+      if (!imgBitmap) return;
+      applyEffect();
+      dlBtn.disabled = false;
+    });
+
+    dlBtn.addEventListener('click', () => {
+      const a = document.createElement('a');
+      a.download = 'glass_stripes_poster.png';
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+    });
+
+    function fitAndDrawBase() {
+      const w = canvas.width;
+      const h = canvas.height;
+
+      const s = Math.min(w / imgBitmap.width, h / imgBitmap.height);
+      const dw = imgBitmap.width * s;
+      const dh = imgBitmap.height * s;
+      const dx = (w - dw) / 2;
+      const dy = (h - dh) / 2;
+
+      srcCanvas.width = w;
+      srcCanvas.height = h;
+
+      sctx.fillStyle = "#000";
+      sctx.fillRect(0, 0, w, h);
+      sctx.drawImage(imgBitmap, dx, dy, dw, dh);
+
+      ctx.drawImage(srcCanvas, 0, 0);
+    }
+
+    function applyEffect() {
+      const w = canvas.width;
+      const h = canvas.height;
+
+      const baseData = sctx.getImageData(0, 0, w, h);
+      const base = baseData.data;
+
+      const distData = ctx.createImageData(w, h);
+      const dist = distData.data;
+
+      // start with original image everywhere
+      dist.set(base);
+
+      // central square region (70% of min dim)
+      const sqSize = Math.round(Math.min(w, h) * 0.7);
+      const sqX0 = Math.round((w - sqSize) / 2);
+      const sqY0 = Math.round((h - sqSize) / 2);
+      const sqX1 = sqX0 + sqSize;
+      const sqY1 = sqY0 + sqSize;
+
+      const period = parseInt(density.value, 10);       // rib width
+      const strengthNum = parseInt(strength.value, 10) / 100;
+
+      const amp = period * 1.2 * strengthNum;          // vertical distortion amplitude
+      const rippleFreq = 2;                            // base bumps per rib
+
+      for (let x = sqX0; x < sqX1; x++) {
+        const localX = x - sqX0;
+        const mod = localX % period;
+        const u = mod / period; // 0..1 inside rib
+
+        // --- DRP-ish irregular ribs ---
+
+        // base smooth wave
+        let wave = Math.sin(u * rippleFreq * Math.PI * 2);
+
+        // micro ripples inside each rib (gives gluey wobble)
+        const micro = Math.sin(u * 18 * Math.PI * 2) * 0.25;
+
+        // rib profile: variation per rib column (gives non-uniform ribs)
+        const ribPhase = (localX / period) * Math.PI * 2;
+        const ribShape = Math.cos(ribPhase); // -1..1
+
+        // combine waves: majority base, some micro, some rib shape
+        wave = wave * 0.7 + micro * 0.3;
+
+        // subtle downward “drip” based on rib shape
+        const drip = ribShape * 0.35;
+
+        const offsetCol = (wave + drip) * amp;
+
+        // rib shading: subtle (option C: 0.8..1)
+        const rib = Math.cos(u * Math.PI * 2);
+        const shade = 0.8 + 0.2 * ((rib + 1) / 2); // very soft ribs
+
+        for (let y = sqY0; y < sqY1; y++) {
+          const localY = y - sqY0;
+
+          let srcLocalY = Math.round(localY + offsetCol);
+          srcLocalY = ((srcLocalY % sqSize) + sqSize) % sqSize; // wrap 0..sqSize-1
+          const srcY = sqY0 + srcLocalY;
+
+          const di = (y * w + x) * 4;
+          const si = (srcY * w + x) * 4;
+
+          let r = base[si];
+          let g = base[si + 1];
+          let b = base[si + 2];
+          const a = base[si + 3];
+
+          r *= shade;
+          g *= shade;
+          b *= shade;
+
+          dist[di] = r;
+          dist[di + 1] = g;
+          dist[di + 2] = b;
+          dist[di + 3] = a;
+        }
+      }
+
+      ctx.putImageData(distData, 0, 0);
+
+      // ---- draw DRP-style glass frame around distorted square ----
+      ctx.save();
+      const radius = 12;
+
+      ctx.imageSmoothingEnabled = false;
+
+      // 1) Outer soft shadow
+      ctx.shadowColor = "rgba(0,0,0,0.55)";
+      ctx.shadowBlur = 22;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 4;
+
+      ctx.strokeStyle = "rgba(0,0,0,0)";
+      ctx.lineWidth = 1;
+
+      ctx.beginPath();
+      roundedRect(ctx, sqX0 + 0.5, sqY0 + 0.5, sqSize - 1, sqSize - 1, radius);
+      ctx.stroke();
+
+      // clear shadow
+      ctx.shadowColor = "transparent";
+
+      // 2) Thin white border
+      ctx.strokeStyle = "rgba(255,255,255,0.75)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      roundedRect(ctx, sqX0 + 0.5, sqY0 + 0.5, sqSize - 1, sqSize - 1, radius);
+      ctx.stroke();
+
+      // 3) Inner glow
+      ctx.strokeStyle = "rgba(255,255,255,0.2)";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      roundedRect(ctx, sqX0 + 2.5, sqY0 + 2.5, sqSize - 5, sqSize - 5, radius - 4);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // helper: rounded rectangle path
+    function roundedRect(ctx, x, y, w, h, r) {
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+    }
+  </script>
+</body>
+
+</html>
